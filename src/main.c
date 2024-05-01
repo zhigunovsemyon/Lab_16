@@ -33,30 +33,28 @@ int WriteToBinary(Rectangle* rects, int arrSize);
 void AskUserForFilename(char filename[], int maxSize);
 void PrintRectangle(Rectangle* Rect, int perimeter);
 
-int
-main(void)
+int main(void)
 {
-	setlocale(LC_ALL, "ru_RU.UTF-8");
 	Rectangle rects[ARR_INIT];
 	int arrSize;
 
 	//Опрос пользователя на способ заполнения массива 
 	if (WayToFill()) //Заполнение из клавиатуры
 	{
-		wprintf(L"Выбрано чтение с клавиатуры\n");
+		printf("Выбрано чтение с клавиатуры\n");
 		//Функция заполнения массива с клавиауты, опрашивающая пользователя в процессе
 		arrSize = ReadFromKeyboard(ARR_INIT, rects);
 
 		//Если при попытке прочитать прямоугольник была ошибка, выводится соответствующая ошибка
 		if (arrSize == 0)
 		{
-			wprintf(L"Введено неправильное значение! Завершение работы\n");
+			printf("Введено неправильное значение! Завершение работы\n");
 			return 1;
 		}
 	}
 	else //Заполнение из файла
 	{
-		wprintf(L"Выбрано чтение из файла\n");
+		printf("Выбрано чтение из файла\n");
 
 		//Заполнение массива из файла, возврат размера массива, либо кода ошибки
 		arrSize = ReadFromBinary(ARR_INIT, rects);
@@ -65,16 +63,16 @@ main(void)
 		switch (arrSize)
 		{
 		case 0:
-			wprintf(L"Ошибка при чтении размера массива! Завершение работы\n");
+			printf("Ошибка при чтении размера массива! Завершение работы\n");
 			return 1;
 		case -2:
-			wprintf(L"Не удалось открыть файл! Завершение работы\n");
+			printf("Не удалось открыть файл! Завершение работы\n");
 			return 1;
 		case -3://Код -3 означает, что размер массива в файле был слишком большим. Значит было...
 			//прочитано максимально возможное количество. Выводится соответствующее сообщение.
 			//Размеру массива обратно присваивается максимальный размер
 			arrSize = ARR_INIT;
-			wprintf(L"ВНИМАНИЕ! В данном файле слишком большое число структур, было прочитано только %d\n", arrSize);
+			printf("ВНИМАНИЕ! В данном файле слишком большое число структур, было прочитано только %d\n", arrSize);
 			//Дальше осуществляется работа в штатном режиме
 		}
 	}
@@ -82,7 +80,7 @@ main(void)
 	if (DoWrite())			//Запись в файл
 		if (WriteToBinary(rects, arrSize))
 		{	//Если функция записи вернула флаг ошибки, программа выводит сообщение об ошибке и аварийно завершается
-			wprintf(L"Не удалось открыть файл! Завершение работы\n");
+			printf("Не удалось открыть файл! Завершение работы\n");
 			return 1;
 		}
 
@@ -94,15 +92,14 @@ main(void)
 }
 
 //Выбор пользователем способа заполнения массива. 
-int
-WayToFill(void)
+int WayToFill(void)
 {
 	char buff[BUFF_INIT];
 	char answer;
 	do
 	{
-		wprintf(L"Введите f для заполения массива из файла,\n%ls",
-			L"либо k для ввода с клавиатуры: ");
+		printf("Введите f для заполения массива из файла,\n%s",
+			"либо k для ввода с клавиатуры: ");
 		fgets(buff, BUFF_INIT - 1, stdin);
 		sscanf(buff, "%c", &answer);
 
@@ -116,17 +113,15 @@ WayToFill(void)
 }
 
 //Записывает в буфер filename название файла, полученное у пользователя, не более данного размера maxSize
-void
-AskUserForFilename(char filename[], int maxSize)
+void AskUserForFilename(char filename[], int maxSize)
 {
-	wprintf(L"Введите название файла: ");
+	printf("Введите название файла: ");
 	fgets(filename, maxSize - 1, stdin);
 	sscanf(filename, "%[^\n]s", filename); //Ведёт чтение из строки
 }
 
 //Определяет количество прямоугольников не более данного maxAmount из переданного источника source
-int
-HowManyRectangles(int maxAmount, FILE* source)
+int HowManyRectangles(int maxAmount, FILE* source)
 {
 	char buff[BUFF_INIT];
 	int amount;
@@ -142,21 +137,20 @@ HowManyRectangles(int maxAmount, FILE* source)
 }
 
 //Способ наполнения данного массива rects, не более максимального размера maxSize, взаимодействующий с пользователем
-int
-ReadFromKeyboard(int maxSize, Rectangle rects[])
+int ReadFromKeyboard(int maxSize, Rectangle rects[])
 {
 	int arrSize;
 	do
 	{
-		wprintf(L"Сколько прямоугольников вы хотите ввести? ");
+		printf("Сколько прямоугольников вы хотите ввести? ");
 		arrSize = HowManyRectangles(maxSize, stdin);	//Ввод размера массива
 		if (arrSize > 0)							//Если был возвращён корректный размер массива...
 			break;									//Цикл ввода прерывается
-		wprintf(L"Неправильное значение!\n");		//В противном случае выводится сообщение об ошибке...
+		printf("Неправильное значение!\n");		//В противном случае выводится сообщение об ошибке...
 	} while (1);									//Цикл начинается заново
 
-	wprintf(L"Введите через пробел координату x левого верхнего угла прямоугольника,\n%ls",
-		L"координату y, размер по горизонтали и по вертикали\n");
+	printf("Введите через пробел координату x левого верхнего угла прямоугольника,\n%s",
+		"координату y, размер по горизонтали и по вертикали\n");
 	if (FillArrayOfRects(stdin, rects, arrSize))	//Наполнение массива через функцию
 		return 0;	//Если в результате заполнения был возвращён флаг ошибки, то этот флаг возвращается 
 
@@ -164,8 +158,7 @@ ReadFromKeyboard(int maxSize, Rectangle rects[])
 }
 
 //Способ наполнения данного массива rects из бинарного файла, не более максимального размера maxSize
-int
-ReadFromBinary(int maxSize, Rectangle rects[])
+int ReadFromBinary(int maxSize, Rectangle rects[])
 {
 	FILE* source;
 	char filename[BUFF_INIT];
@@ -201,8 +194,7 @@ ReadFromBinary(int maxSize, Rectangle rects[])
 }
 
 //Чтение прямоугольника в данный адрес Rect из данного текста source. Возвращает 0 при успешном выполнении, 1 при ошибке
-int
-ReadSingleRect(const char source[], Rectangle* Rect)
+int ReadSingleRect(const char source[], Rectangle* Rect)
 {
 	if (sscanf(source, "%d %d %d %d", &Rect->x, &Rect->y, &Rect->hsize, &Rect->vsize) != 4)
 		return 1;	//Код ошибки, если количество элементов в строке было меньше 4
@@ -215,8 +207,7 @@ ReadSingleRect(const char source[], Rectangle* Rect)
 }
 
 //Чтение arrSize прямоугольников в массив rects из текстового источника source
-int
-FillArrayOfRects(FILE* source, Rectangle rects[], int arrSize)
+int FillArrayOfRects(FILE* source, Rectangle rects[], int arrSize)
 {
 	char textbuff[BUFF_INIT];
 	for (int i = 0; i < arrSize; ++i)
@@ -229,14 +220,13 @@ FillArrayOfRects(FILE* source, Rectangle rects[], int arrSize)
 }
 
 //Опрос пользователя, будет ли он записывать массив в файл
-int
-DoWrite(void)
+int DoWrite(void)
 {
 	char buff[BUFF_INIT];
 	char answer;
 	do
 	{
-		wprintf(L"Хотите записать массив в файл? y | n \n");
+		printf("Хотите записать массив в файл? y | n \n");
 		fgets(buff, BUFF_INIT - 1, stdin);
 		sscanf(buff, "%c", &answer);
 
@@ -250,8 +240,7 @@ DoWrite(void)
 }
 
 //Запись в бинарный файл данного массива rects данного размера arrSize
-int
-WriteToBinary(Rectangle* rects, int arrSize)
+int WriteToBinary(Rectangle* rects, int arrSize)
 {
 	FILE* ourfile;
 	char filename[BUFF_INIT];
@@ -267,8 +256,7 @@ WriteToBinary(Rectangle* rects, int arrSize)
 }
 
 //Поиск индекса прямоугольника c наименьшим периметром из массива Rects среди количества amountOfRects
-int
-GetSmallestRect(Rectangle Rects[], int amountOfRects)
+int GetSmallestRect(Rectangle Rects[], int amountOfRects)
 {
 	int candidate = 0;	//Для начала утверждается, что наименьший прямоугольник - первый
 
@@ -288,16 +276,14 @@ GetSmallestRect(Rectangle Rects[], int amountOfRects)
 }
 
 //Вычисление периметра прямоугольника, данного его указателем Rect
-int
-CalcPerimeter(Rectangle* Rect)
+int CalcPerimeter(Rectangle* Rect)
 {
 	return 2 * (Rect->hsize + Rect->vsize);
 }
 
 //Вывод расположения прямоугольника Rect, данного его указателем, и периметра perimeter
-void
-PrintRectangle(Rectangle* Rect, int perimeter)
+void PrintRectangle(Rectangle* Rect, int perimeter)
 {
-	wprintf(L"Левый верхний угол прямогольника - (%d;%d)\n", Rect->x, Rect->y);
-	wprintf(L"Периметр прямоугольника - %d\n", perimeter);
+	printf("Левый верхний угол прямогольника - (%d;%d)\n", Rect->x, Rect->y);
+	printf("Периметр прямоугольника - %d\n", perimeter);
 }
